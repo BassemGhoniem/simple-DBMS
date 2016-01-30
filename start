@@ -1,0 +1,186 @@
+#!/bin/bash
+#
+# SCRIPT: Simple File based database system
+# AUTHOR: Bassem
+# DATE:   30-01-2016
+#
+# set -x   # Uncomment to debug this shell script
+#
+
+trap "echo -e \"\nEXITING on a TRAPPED SIGNAL\";exit" 1 2 3 15
+
+mainMenu=('Create' 'Drop' 'List & Manipulate' 'EXIT')
+dbManMenu=('Create table' 'Drop table' 'List & Manipulate' 'Alter table' 'BACK')
+tableManMenu=('Update Record' 'Display Record' 'Delete Record' 'Insert Record' 'BACK')
+greeting="\n\tWELCOME IN THE PSYCHO DATABASE SYSTEM\n"
+mybanner=Psycho
+
+showTableManpMenu(){
+ clear
+
+  echo -e "\n\tYou are manipulating $(echo $1 | tr '[a-z]' '[A-Z]') table\n"
+  banner $mybanner
+  PS3="Select the desired action and press Enter: "
+
+  select option in "${tableManMenu[@]}";
+  do
+
+    if [[ BACK = $option ]];
+    then
+      return
+    elif [[ 'Update Record' = $option ]];
+    then
+      echo "Creation in progress"
+    elif [[ 'Display Record' = $option ]];
+    then
+      echo "what??"
+    elif [[ 'Delete Record' = $option ]];
+    then
+      echo "in progress"
+    elif [[ 'Insert Record' = $option ]];
+    then
+      echo "Why??"
+    fi
+    REPLY=
+    echo -e "\nPress Enter to Continue...\c"
+    read
+    clear
+    echo -e "\n\tYou are manipulating $(echo $1 | tr '[a-z]' '[A-Z]') database\n"
+    banner $mybanner
+  done
+  clear
+
+}
+
+
+
+
+showAvaTables(){
+  clear
+
+  echo -e $greeting
+  banner $mybanner
+  PS3="Select Table and press Enter: "
+
+  select table in `ls --file-type | grep -v '$/'` BACK;
+  do
+    [[ BACK = $table ]] && return
+    if [[ -f $table ]];
+    then
+      echo $PWD
+
+      showTableManpMenu $table
+    fi
+    REPLY=
+    echo -e "\nPress enter to Continue...\c"
+    read
+    clear
+    echo -e $greeting
+    banner $mybanner
+  done
+
+}
+
+
+
+
+showDBManpMenu(){
+ clear
+
+  echo -e "\n\tYou are inside $(echo $1 | tr '[a-z]' '[A-Z]') database\n"
+  banner $mybanner
+  PS3="Select the desired action and press Enter: "
+
+  select option in "${dbManMenu[@]}";
+  do
+
+    if [[ BACK = $option ]];
+    then
+      cd ..
+      return
+    elif [[ 'Create table' = $option ]];
+    then
+      echo "Creation in progress"
+    elif [[ 'List & Manipulate' = $option ]];
+    then
+      showAvaTables
+    elif [[ 'Drop table' = $option ]];
+    then
+      echo "in progress"
+    elif [[ 'Alter table' = $option ]];
+    then
+      echo "alter"
+    fi
+    REPLY=
+    echo -e "\nPress Enter to Continue...\c"
+    read
+    clear
+    echo -e "\n\tYou are inside $(echo $1 | tr '[a-z]' '[A-Z]') database\n"
+    banner $mybanner
+  done
+  clear
+
+}
+
+
+
+
+showAvaDB(){
+  clear
+
+  echo -e $greeting
+  banner $mybanner
+  PS3="Select Database and press Enter: "
+
+  select database in `for i in $(ls -d */); do echo ${i%%/}; done;` BACK;
+  do
+    [[ BACK = $database ]] && return
+    if [[ -d $database ]];
+    then
+      cd $database
+      showDBManpMenu $database
+    fi
+    REPLY=
+    echo -e "\nPress Enter to Continue...\c"
+    read
+    clear
+    echo -e $greeting
+    banner $mybanner
+  done
+
+}
+
+
+showMainMenu(){
+  clear
+
+  echo -e $greeting
+  banner $mybanner
+  PS3="Select an option and press Enter: "
+
+  select option in "${mainMenu[@]}";
+  do
+
+    [[ EXIT = $option ]] && break
+    if [[ Create = $option ]];
+    then
+      echo "Creation in progress"
+    elif [[ 'List & Manipulate' = $option ]];
+    then
+      showAvaDB
+    elif [[ Drop = $option ]];
+    then
+      echo "in progress"
+    fi
+
+    REPLY=
+    echo -e "\nPress Enter to Continue...\c"
+    read
+    clear
+    echo -e $greeting
+    banner $mybanner
+  done
+  clear
+}
+
+showMainMenu
